@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'posts',
     'petsitters',
     'customers',
-    
+    'rest_framework',
+
 ]
 
 MIDDLEWARE = [
