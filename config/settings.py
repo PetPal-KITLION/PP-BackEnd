@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
-from mysettings import MY_SECRET_KEY
+from mysettings import MY_SECRET_KEY, MY_HOST_USER, MY_HOST_PASSWORD
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -38,14 +38,30 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+
     'accounts',
     'posts',
     'petsitters',
     'customers',
-    'rest_framework',
-    'rest_framework.authtoken'
 
+    'rest_framework',
+    'rest_framework.authtoken',
+    
+    'dj_rest_auth',
+
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ]
+}
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -107,6 +123,13 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = [
+    # Needed to login by username in Django admin, regardless of `allauth`
+    'django.contrib.auth.backends.ModelBackend',
+
+    # `allauth` specific authentication methods, such as login by e-mail
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
@@ -131,3 +154,36 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'accounts.Member'
+
+SITE_ID = 1
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+EMAIL_HOST = 'smtp.gmail.com' # 메일 호스트 서버
+
+EMAIL_PORT = '587' # gmail과 통신하는 포트
+ 
+EMAIL_HOST_USER = MY_HOST_USER # 발신할 이메일
+
+EMAIL_HOST_PASSWORD = MY_HOST_PASSWORD # 발신할 메일의 비밀번호
+
+EMAIL_USE_TLS = True # TLS 보안 방법
+
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+URL_FRONT = 'http://****' # 공개적인 웹페이지가 있다면 등록
+
+ACCOUNT_CONFIRM_EMAIL_ON_GET = True # 유저가 받은 링크를 클릭하면 회원가입 완료되게끔
+ACCOUNT_EMAIL_REQUIRED = True
+
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+# ACCOUNT_EMAIL_VERIFICATION = "none"
+
+EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = '/' # 사이트와 관련한 자동응답을 받을 이메일 주소,'webmaster@localhost'
+
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 1
+
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_AUTHENTICATION_METHOD = ["email"] # 이메일 인증
+ACCOUNT_EMAIL_REQUIRED = True # email 필요
+ACCOUNT_USERNAME_REQUIRED = False # username 불필요
+ACCOUNT_SIGNUP_PASSWORD_VERIFICATION = False
