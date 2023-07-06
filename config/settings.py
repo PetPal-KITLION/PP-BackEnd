@@ -65,9 +65,6 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
     ],
-    'DEFAULT_PERMISSION_CLASSES':[
-        'rest_framework.permissions.IsAuthenticated',
-    ]
 }
 
 
@@ -185,7 +182,7 @@ EMAIL_HOST_PASSWORD = MY_HOST_PASSWORD # 발신할 메일의 비밀번호
 
 EMAIL_USE_TLS = True # TLS 보안 방법
 
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+DEFAULT_FROM_EMAIL = "PetPal"
 
 # ACCOUNT_CONFIRM_EMAIL_ON_GET = True # 유저가 받은 링크를 클릭하면 회원가입 완료되게끔
 ACCOUNT_EMAIL_REQUIRED = True
