@@ -84,3 +84,28 @@ class CheckDuplicateView(APIView):
             return Response({'message' : 'true'},status = 400)
         
         return Response({'response':'false'})
+    
+# @permission_classes([AllowAny])
+# class FindEmailView(APIView):
+#     def post(self, request):
+        
+#         name = request.data.get('name')
+        
+#         user = Member.objects.get(email=name)
+        
+#         if name and Member.objects.filter(name=name).exists():
+#             user_email = Member
+#             return Response({''})
+@permission_classes([AllowAny])
+
+class FindPasswordView(APIView):
+    def post(self, request):
+        
+        email = request.data.get('email')
+        user = Member.objects.get(email=email)
+        
+        if user:
+            user_password = user.password
+            return Response({'password':user_password})
+        else:
+            return Response({'error':'가입되지 않은 유저'},status=400)
