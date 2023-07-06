@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
 class MemberManager(BaseUserManager):
+
     def create_user(self, email, password=None, **extra_fields):
         if not email:
             raise ValueError('The Email field must be set')
@@ -10,6 +11,10 @@ class MemberManager(BaseUserManager):
         user.set_password(password)
         user.save()
         return user
+    
+    def create_superuser(self, email, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        return self.create_user(email, password, **extra_fields)
 
 class Member(AbstractBaseUser):
     id = models.AutoField(primary_key=True, unique=True)
@@ -18,6 +23,11 @@ class Member(AbstractBaseUser):
     nickname = models.CharField(verbose_name='닉네임', max_length=100)
     password = models.CharField(verbose_name='비밀번호', max_length=128)
     phone = models.CharField(verbose_name='전화번호', max_length=20, default = '')
+    address = models.CharField(verbose_name="주소", max_length=100, default = '')
+    age = models.IntegerField(verbose_name="나이", default=0)
+    review_star = models.IntegerField(verbose_name="최근받은점수", default = 0)
+    
+    token = models.TextField(verbose_name='토큰', default='')
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -25,7 +35,7 @@ class Member(AbstractBaseUser):
     objects = MemberManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['name', 'nickname', 'phone']
+    REQUIRED_FIELDS = []
 
     def __str__(self):
         return self.email
