@@ -35,7 +35,11 @@ class LoginView(APIView):
         password = request.data.get('password')
         user = authenticate(request, username=email, password=password)
         if user:
+            member = Member.objects.get(email=email)
             token, _ = Token.objects.get_or_create(user=user)
+            print(token)
+            member.token = token.key
+            member.save()
             return Response({'token':token.key})
         else:
             return Response({'message': '유저가 존재하지 않음'}, status=400)
@@ -46,11 +50,13 @@ class LogoutView(APIView):
         token = request.headers.get('Authorization')
         if token:
             try:
-                Token.objects.get(key=token).delete()
+                member = Member.objects.get(token=token)
+                member.token = ''
+                member.save()
                 return Response({'message' : '로그아웃 완료'})
             except Token.DoesNotExist:
                 return Response({'error':'토큰이 존재하지 않습니다'},status = 401)
-        return Response({'error':'유효하지 않은 토큰입니다.'}, status=400)
+        return Response({'error':'유효하지 않은 토큰이거나 토큰이 없습니다.'}, status=400)
     
 # 이메일 인증 메일 보내기
 class SendMailView(APIView):
