@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path,include,re_path
-from .views import SignupView, LoginView, SendMailView, CheckDuplicateView,LogoutView,FindEmailView
+from .views import SignupView, LoginView, SendMailView, CheckDuplicateView,LogoutView,FindEmailView,ResetPasswordEmailView,ResetPasswordSaveView
 
 
 
@@ -11,6 +11,8 @@ urlpatterns=[
     path('logout/', LogoutView.as_view(),name="logout"),
     path('member/', CheckDuplicateView.as_view(),name="check"),
     path('email/', SendMailView.as_view(), name="email"),
-    path('findid/', FindEmailView.as_view(),name='findid'),
+    path('find-email/', FindEmailView.as_view(),name='findid'),
+    path('reset/verify/', ResetPasswordEmailView.as_view(), name="reset-verify"),
+    path('reset/password/',ResetPasswordSaveView.as_view(), name="reset-save"),
     
 ]
