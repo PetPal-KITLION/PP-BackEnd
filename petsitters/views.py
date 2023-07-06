@@ -8,6 +8,14 @@ from .serializers import PetsittersPostBaseSerializer, PetsittersPostListSeriali
 
 from django.shortcuts import get_object_or_404
 
+# Create
+class PetsittersPostCreateView(generics.CreateAPIView):
+    queryset = petsitters_post.objects.all()
+    serializer_class = PetsittersPostBaseSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(member=self.request.user)
+        
 class PetsittersPostViewSet(viewsets.ModelViewSet):
     queryset = petsitters_post.objects.all()
     serializer_class = PetsittersPostBaseSerializer
@@ -26,6 +34,39 @@ class PetsittersPostViewSet(viewsets.ModelViewSet):
         post = get_object_or_404(petsitters_post, pk=pk)
         serializer = self.get_serializer(post)
         return Response(serializer.data)
+
+# Update
+class PetsittersPostUpdateView(generics.UpdateAPIView):
+    queryset = petsitters_post.objects.all()
+    serializer_class = PetsittersPostBaseSerializer
+    lookup_field = 'pk'
+
+# Delete
+class PetsittersPostDestroyView(generics.DestroyAPIView):
+    queryset = petsitters_post.objects.all()
+    serializer_class = PetsittersPostBaseSerializer
+    lookup_field = 'pk'
+
+# Comments
+class PetsittersCommentCreateView(generics.CreateAPIView):
+    queryset = petsitters_comment.objects.all()
+    serializer_class = PetsittersCommentSerializer
+
+    def perform_create(self, serializer):
+        post_id = self.kwargs.get('pk')
+        post = get_object_or_404(petsitters_post, id=post_id)
+        serializer.save(post_id=post)
+
+class PetsittersCommentUpdateView(generics.UpdateAPIView):
+    queryset = petsitters_comment.objects.all()
+    serializer_class = PetsittersCommentSerializer
+    lookup_field = 'pk'
+
+class PetsittersCommentDestroyView(generics.DestroyAPIView):
+    queryset = petsitters_comment.objects.all()
+    serializer_class = PetsittersCommentSerializer
+    lookup_field = 'pk'
+
 
 class PetsittersCommentViewSet(viewsets.ModelViewSet):
     serializer_class = PetsittersCommentSerializer
