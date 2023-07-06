@@ -1,10 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 
-from customers.models import Member
-
-
-User = get_user_model()
+from accounts.models import Member
 
 class petsitters_post(models.Model):
     CATEGORY_CHOICES =[
@@ -14,7 +11,7 @@ class petsitters_post(models.Model):
 
     id = models.AutoField(primary_key=True)
     category = models.CharField(verbose_name='시터등급', max_length=1, choices=CATEGORY_CHOICES, default='1' )
-    member = models.ForeignKey(to=User, verbose_name='작성자', on_delete=models.CASCADE, null=True, blank=True)
+    member = models.ForeignKey(to=Member, verbose_name='작성자', on_delete=models.CASCADE, null=True, blank=True)
     title = models.CharField(verbose_name='제목', max_length=200)
     image = models.ImageField(verbose_name='이미지', upload_to='petsitters/images/', null=True, blank=True)
     data_start = models.CharField(verbose_name='임시보호 시작 날짜',max_length=100, null=True)

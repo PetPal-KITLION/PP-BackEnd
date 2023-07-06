@@ -6,8 +6,10 @@ User = get_user_model()
 
 class board_post(models.Model):
     CATEGORY_CHOICES =[
-        ('1', '소통'),
-        ('2', '정보'),
+        ('1', '질문'),
+        ('2', '소통'),
+        ('3', '정보'),
+        ('4', '일상'),
     ]
 
     id = models.AutoField(verbose_name='작성자', primary_key=True)

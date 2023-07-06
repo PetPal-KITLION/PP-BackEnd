@@ -3,6 +3,10 @@ from rest_framework.generics import RetrieveUpdateDestroyAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
+from django.contrib.auth import get_user_model
+
+from accounts.models import Member
+
 from .models import petsitters_post, petsitters_comment
 from .serializers import PetsittersPostBaseSerializer, PetsittersPostListSerializer, PetsittersCommentSerializer
 
@@ -14,7 +18,11 @@ class PetsittersPostCreateView(generics.CreateAPIView):
     serializer_class = PetsittersPostBaseSerializer
 
     def perform_create(self, serializer):
-        serializer.save(member=self.request.user)
+        # print(self.request.data['member'])
+        token = self.request.headers.get('Authorization')
+        print(token)
+        # member = Member.objects.get(nickname=self.request.user)
+        serializer.save()
         
 class PetsittersPostViewSet(viewsets.ModelViewSet):
     queryset = petsitters_post.objects.all()
@@ -41,11 +49,19 @@ class PetsittersPostUpdateView(generics.UpdateAPIView):
     serializer_class = PetsittersPostBaseSerializer
     lookup_field = 'pk'
 
+    def get(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
 # Delete
 class PetsittersPostDestroyView(generics.DestroyAPIView):
     queryset = petsitters_post.objects.all()
     serializer_class = PetsittersPostBaseSerializer
     lookup_field = 'pk'
+
+    def get(self, request, *args, **kwargs):
+        return Response()
 
 # Comments
 class PetsittersCommentCreateView(generics.CreateAPIView):

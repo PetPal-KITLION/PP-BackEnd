@@ -15,7 +15,7 @@ from django.core.mail import EmailMessage
 
 
 # Create your views here.
-@permission_classes([AllowAny])
+
 class SignupView(APIView):
     def post(self, request):
         serializer = MemberSerializer(data = request.data)
@@ -24,7 +24,7 @@ class SignupView(APIView):
             return Response({'message':'회원가입 완료'})
         return Response(serializer.errors, status =  400)
 
-@permission_classes([AllowAny])    
+@permission_classes([AllowAny]) 
 class LoginView(APIView):
     def post(self, request):
         email = request.data.get('email')
