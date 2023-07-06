@@ -8,7 +8,7 @@ from rest_framework.decorators import permission_classes, authentication_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth import authenticate
 from rest_framework.authentication import TokenAuthentication
-
+from django.contrib.auth import get_user_model
 from .serializers import MemberSerializer
 from django.core.mail import EmailMessage
 
@@ -38,9 +38,8 @@ class LoginView(APIView):
 
 @permission_classes([AllowAny])
 class LogoutView(APIView):
-    def post(self, request):
-        token = request.data.get('token')
-        
+    def get(self, request):
+        token = request.headers.get('Authorization')
         if token:
             try:
                 Token.objects.get(key=token).delete()
@@ -85,27 +84,18 @@ class CheckDuplicateView(APIView):
         
         return Response({'response':'false'})
     
-# @permission_classes([AllowAny])
-# class FindEmailView(APIView):
-#     def post(self, request):
-        
-#         name = request.data.get('name')
-        
-#         user = Member.objects.get(email=name)
-        
-#         if name and Member.objects.filter(name=name).exists():
-#             user_email = Member
-#             return Response({''})
 @permission_classes([AllowAny])
-
-class FindPasswordView(APIView):
+class FindEmailView(APIView):
     def post(self, request):
+
+        name = request.data.get('name')
+        phone = request.data.get('phone')
+        User = get_user_model()
         
-        email = request.data.get('email')
-        user = Member.objects.get(email=email)
-        
-        if user:
-            user_password = user.password
-            return Response({'password':user_password})
-        else:
-            return Response({'error':'가입되지 않은 유저'},status=400)
+        try:
+            user = User.objects.filter(name=name, phone=phone).first()
+            user_email = user.email
+            return Response({'email': user_email}, status=200)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found'}, status=404)
+            
