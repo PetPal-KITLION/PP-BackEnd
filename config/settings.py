@@ -44,12 +44,14 @@ INSTALLED_APPS = [
     'posts',
     'petsitters',
     'customers',
-
+    
     'rest_framework',
     'rest_framework.authtoken',
     
     'dj_rest_auth',
-
+    
+    'corsheaders',
+    
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -70,6 +72,7 @@ REST_FRAMEWORK = {
 
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware', 
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -78,6 +81,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+CORS_ORIGIN_ALLOW_ALL = True # 전 아이피 다 허용
+CORS_ALLOW_CREDENTIALS = True 
 
 ROOT_URLCONF = 'config.urls'
 
@@ -176,9 +181,7 @@ EMAIL_USE_TLS = True # TLS 보안 방법
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
-URL_FRONT = 'http://****' # 공개적인 웹페이지가 있다면 등록
-
-ACCOUNT_CONFIRM_EMAIL_ON_GET = True # 유저가 받은 링크를 클릭하면 회원가입 완료되게끔
+# ACCOUNT_CONFIRM_EMAIL_ON_GET = True # 유저가 받은 링크를 클릭하면 회원가입 완료되게끔
 ACCOUNT_EMAIL_REQUIRED = True
 
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
