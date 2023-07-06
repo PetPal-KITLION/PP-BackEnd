@@ -3,25 +3,28 @@ from django.contrib.auth import get_user_model
 
 from customers.models import Member
 
+
 User = get_user_model()
 
 class petsitters_post(models.Model):
     CATEGORY_CHOICES =[
-        ('1', '일반'),
-        ('2', '프리미엄'),
+        ('1', '시터신청'),
+        ('2', '시터찾기'),
     ]
 
     id = models.AutoField(primary_key=True)
+    category = models.CharField(verbose_name='시터등급', max_length=1, choices=CATEGORY_CHOICES, default='1' )
+    member = models.ForeignKey(to=User, verbose_name='작성자', on_delete=models.CASCADE, null=True, blank=True)
     title = models.CharField(verbose_name='제목', max_length=200)
-    content = models.CharField(verbose_name='내용',max_length=200)
-    
-    #comment는 없어도 될 것 같다.
-    comment = models.TextField(verbose_name='댓글',null=True)
-    likes = models.ManyToManyField(User, related_name='liked_posts', blank=True)
-    category = models.CharField(verbose_name='카테고리', max_length=1, choices=CATEGORY_CHOICES, default='1' )
     image = models.ImageField(verbose_name='이미지', upload_to='petsitters/images/', null=True, blank=True)
+    data_start = models.CharField(verbose_name='임시보호 시작 날짜',max_length=100, null=True)
+    data_end = models.CharField(verbose_name='임시보호 종료 날짜',max_length=100, null=True)
 
-    member = models.ForeignKey(to=User, on_delete=models.CASCADE, null=True, blank=True)
+    pay = models.IntegerField(verbose_name='임시보호 수수료', default=0)
+    address = models.CharField(verbose_name='주소', max_length=200, default='')
+    phone_number = models.CharField(verbose_name='연락처',max_length=15,null=True)
+    etc = models.CharField(verbose_name='기타사항',max_length=200,null=True)
+
     view_count = models.IntegerField(verbose_name='조회수', default=0)
     create_time = models.DateTimeField(verbose_name='작성일', auto_now_add=True)
 

@@ -75,18 +75,3 @@ class PetsittersCommentViewSet(viewsets.ModelViewSet):
         post_id = self.kwargs.get('pk')
         return petsitters_comment.objects.filter(post_id=post_id)
 
-class ToggleLikeAPIView(APIView):
-    def post(self, request, pk):
-        post = get_object_or_404(petsitters_post, id=pk)
-        user = request.user
-
-        if post.likes.filter(id=user.id).exists():
-            # 이미 좋아요를 눌렀을 경우, 좋아요 제거
-            post.likes.remove(user)
-            response_data = {'status': 'unliked'}
-        else:
-            # 좋아요 추가
-            post.likes.add(user)
-            response_data = {'status': 'liked'}
-
-        return Response(response_data)

@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model  
 from .models import petsitters_post, petsitters_comment
 
-User = get_user_model()  # 수정된 부분
+User = get_user_model()
 
 class PetsittersCommentSerializer(serializers.ModelSerializer):
     class Meta:
