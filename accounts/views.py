@@ -49,8 +49,8 @@ class LogoutView(APIView):
                 member.save()
                 return Response({'message' : '로그아웃 완료'})
             except ObjectDoesNotExist:
-                return Response({'error':'로그인 해주세요'},status = 401)
-        return Response({'error':'토큰이 없습니다.'}, status=400)
+                return Response({'error':'유효하지 않은 토큰입니다'},status = 400)
+        return Response({'error':'로그인이 필요합니다'}, status=401)
     
 # 이메일 인증 메일 보내기
 class SendMailView(APIView):
@@ -138,6 +138,9 @@ class MyProfileView(APIView):
                 
                 profile_data = {
                     'name' : member.name,
+                    'email' : member.email,
+                    'nickname': member.nickname,
+                    'phone' : member.phone,
                     'address' : member.address,
                     'age' : member.age,
                     'review_star' : average_score,
@@ -146,8 +149,8 @@ class MyProfileView(APIView):
                 
                 return Response(profile_data, status=200)
             except ObjectDoesNotExist:
-                return Response({'error':'로그인 해주세요'},status = 401)
-        return Response({'error':'토큰이 없습니다.'}, status=400)
+                return Response({'error':'유효하지 않은 토큰입니다'},status = 400)
+        return Response({'error':'로그인이 필요합니다'}, status=401)
 
 class RegistPetView(APIView):
     
