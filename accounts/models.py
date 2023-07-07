@@ -25,7 +25,6 @@ class Member(AbstractBaseUser):
     phone = models.CharField(verbose_name='전화번호', max_length=20, default = '')
     address = models.CharField(verbose_name="주소", max_length=100, default = '')
     age = models.IntegerField(verbose_name="나이", default=0)
-    review_star = models.IntegerField(verbose_name="최근받은점수", default = 0)
     
     token = models.TextField(verbose_name='토큰', default='')
 
@@ -39,3 +38,23 @@ class Member(AbstractBaseUser):
 
     def __str__(self):
         return self.email
+
+class Pet(models.Model):
+    id = models.AutoField(primary_key=True, unique=True)
+    name = models.CharField(verbose_name='펫이름', max_length=100)
+    species = models.CharField(verbose_name='종', max_length=100)
+    age = models.IntegerField(verbose_name='펫나이')
+    feature = models.TextField(verbose_name='펫특이사항')
+    member = models.ForeignKey(to=Member, on_delete=models.CASCADE, related_name='pets')
+
+    def __str__(self):
+        return self.pet_name
+    
+class Review(models.Model):
+    id = models.AutoField(primary_key=True, unique=True)
+    content = models.TextField(verbose_name='리뷰내용', default='')
+    score = models.IntegerField(verbose_name='점수')
+    member = models.ForeignKey(to=Member, on_delete=models.CASCADE, related_name='reviews')
+    
+    def __str__(self):
+        return f"Review {self.score}"
