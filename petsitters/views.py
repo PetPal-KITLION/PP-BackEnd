@@ -7,23 +7,22 @@ from django.contrib.auth import get_user_model
 
 from accounts.models import Member
 
-from .models import petsitters_post, petsitters_comment
-from .serializers import PetsittersPostBaseSerializer, PetsittersPostListSerializer, PetsittersCommentSerializer
+from .models import petsitters_post, petsitters_comment, petsitters_apply
+from .serializers import PetsittersPostBaseSerializer, PetsittersPostListSerializer, PetsittersCommentSerializer, PetsittersApplyBaseSerializer, PetsittersApplyListSerializer
 
 from django.shortcuts import get_object_or_404
 
-# Create
+# Post - Create
 class PetsittersPostCreateView(generics.CreateAPIView):
     queryset = petsitters_post.objects.all()
     serializer_class = PetsittersPostBaseSerializer
 
     def perform_create(self, serializer):
-        # print(self.request.data['member'])
         token = self.request.headers.get('Authorization')
         print(token)
-        # member = Member.objects.get(nickname=self.request.user)
         serializer.save()
-        
+
+# Post - Retrieve        
 class PetsittersPostViewSet(viewsets.ModelViewSet):
     queryset = petsitters_post.objects.all()
     serializer_class = PetsittersPostBaseSerializer
@@ -43,7 +42,7 @@ class PetsittersPostViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(post)
         return Response(serializer.data)
 
-# Update
+# Post - Update
 class PetsittersPostUpdateView(generics.UpdateAPIView):
     queryset = petsitters_post.objects.all()
     serializer_class = PetsittersPostBaseSerializer
@@ -54,7 +53,7 @@ class PetsittersPostUpdateView(generics.UpdateAPIView):
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
 
-# Delete
+# Post - Delete
 class PetsittersPostDestroyView(generics.DestroyAPIView):
     queryset = petsitters_post.objects.all()
     serializer_class = PetsittersPostBaseSerializer
@@ -63,31 +62,57 @@ class PetsittersPostDestroyView(generics.DestroyAPIView):
     def get(self, request, *args, **kwargs):
         return Response()
 
-# Comments
-class PetsittersCommentCreateView(generics.CreateAPIView):
-    queryset = petsitters_comment.objects.all()
-    serializer_class = PetsittersCommentSerializer
-
-    def perform_create(self, serializer):
-        post_id = self.kwargs.get('pk')
-        post = get_object_or_404(petsitters_post, id=post_id)
-        serializer.save(post_id=post)
-
-class PetsittersCommentUpdateView(generics.UpdateAPIView):
-    queryset = petsitters_comment.objects.all()
-    serializer_class = PetsittersCommentSerializer
-    lookup_field = 'pk'
-
-class PetsittersCommentDestroyView(generics.DestroyAPIView):
-    queryset = petsitters_comment.objects.all()
-    serializer_class = PetsittersCommentSerializer
-    lookup_field = 'pk'
-
-
+# Post - Comments
 class PetsittersCommentViewSet(viewsets.ModelViewSet):
     serializer_class = PetsittersCommentSerializer
+    queryset = petsitters_comment.objects.all()
 
-    def get_queryset(self):
-        post_id = self.kwargs.get('pk')
-        return petsitters_comment.objects.filter(post_id=post_id)
+# Apply_create
+class PetsittersApplyCreateView(generics.CreateAPIView):
+    queryset = petsitters_apply.objects.all()
+    serializer_class = PetsittersApplyBaseSerializer
 
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+
+# Apply_retrieve
+class PetsittersApplyViewSet(viewsets.ModelViewSet):
+    queryset = petsitters_apply.objects.all()
+    serializer_class = PetsittersApplyBaseSerializer
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return PetsittersApplyListSerializer
+        return super().get_serializer_class()
+    
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+    
+    def retrieve(self, request, pk=None):
+        post = get_object_or_404(petsitters_apply, pk=pk)
+        serializer = self.get_serializer(post)
+        return Response(serializer.data)
+    
+
+# Apply_update
+class PetsittersApplyUpdateView(generics.UpdateAPIView):
+    queryset = petsitters_apply.objects.all()
+    serializer_class = PetsittersApplyBaseSerializer
+    lookup_field = 'pk'
+
+    def get(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+    
+
+# Apply_Delete
+class PetsittersApplyDestroyView(generics.DestroyAPIView):
+    queryset = petsitters_apply.objects.all()
+    serializer_class = PetsittersApplyBaseSerializer
+    lookup_field = 'pk'
+
+    def get(self, request, *args, **kwargs):
+        return Response()

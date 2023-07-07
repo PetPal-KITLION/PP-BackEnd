@@ -1,11 +1,10 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-
-from .views import PetsittersCommentViewSet, PetsittersPostViewSet, PetsittersPostCreateView, PetsittersPostUpdateView, PetsittersPostDestroyView, PetsittersCommentCreateView, PetsittersCommentUpdateView, PetsittersCommentDestroyView
+from .views import PetsittersCommentViewSet, PetsittersPostViewSet, PetsittersPostCreateView, PetsittersPostUpdateView, PetsittersPostDestroyView, PetsittersCommentViewSet, PetsittersApplyCreateView, PetsittersApplyViewSet, PetsittersApplyUpdateView, PetsittersApplyDestroyView
 
 router = DefaultRouter()
-router.register(r'posts', PetsittersPostViewSet, basename='petsitters-post')
-router.register(r'comments', PetsittersCommentViewSet, basename='petsitters-comment')
+#router.register(r'posts', PetsittersPostViewSet, basename='petsitters-post')
+#router.register(r'comments', PetsittersCommentViewSet, basename='petsitters-comment')
 
 app_name = 'petsitters'
 urlpatterns = [
@@ -15,9 +14,11 @@ urlpatterns = [
     path('posts/<int:pk>/update/', PetsittersPostUpdateView.as_view(), name='posts-update'),
     path('posts/<int:pk>/delete/', PetsittersPostDestroyView.as_view(), name='posts-delete'),
 
+    path('posts/<int:pk>/comments/', PetsittersCommentViewSet.as_view({'post': 'create', 'get': 'retrieve'}),name='comment-list'),
 
-    path('posts/<int:pk>/comments/', PetsittersCommentCreateView.as_view(), name='comments-create'),
-    path('comments/<int:pk>/update/', PetsittersCommentUpdateView.as_view(), name='comments-update'),
-    path('comments/<int:pk>/delete/', PetsittersCommentDestroyView.as_view(), name='comments-delete'),
-    path('', include(router.urls)),
+    path('apply/', PetsittersApplyViewSet.as_view({'get':'list'}),name='apply-list'),
+    path('apply/create/', PetsittersApplyCreateView.as_view(),name='apply-create'),
+    path('apply/<int:pk>/', PetsittersApplyViewSet.as_view({'get':'retrieve'}), name='apply-detail'),
+    path('apply/<int:pk>/update/', PetsittersApplyUpdateView.as_view(), name='posts-update'),
+    path('apply/<int:pk>/delete/', PetsittersApplyDestroyView.as_view(), name='posts-delete'),
 ]
