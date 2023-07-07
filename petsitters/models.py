@@ -4,13 +4,9 @@ from django.contrib.auth import get_user_model
 from accounts.models import Member
 
 class petsitters_post(models.Model):
-    CATEGORY_CHOICES =[
-        ('1', '시터신청'),
-        ('2', '시터찾기'),
-    ]
 
     id = models.AutoField(primary_key=True)
-    category = models.CharField(verbose_name='구분', max_length=1, choices=CATEGORY_CHOICES, default='1' )
+    category = models.CharField(verbose_name='구분', max_length=20, default='' )
     member = models.ForeignKey(to=Member, verbose_name='작성자', on_delete=models.CASCADE, null=True, blank=True)
     title = models.CharField(verbose_name='제목', max_length=200)
     image = models.ImageField(verbose_name='이미지', upload_to='petsitters/images/', null=True, blank=True)
@@ -31,24 +27,15 @@ class petsitters_comment(models.Model):
     post_id = models.ForeignKey(to=petsitters_post, on_delete=models.CASCADE)
 
 class petsitters_apply(models.Model):
-    OPTIONS = [
-        ('1','네'),
-        ('2','아니요'),
-    ]
-
-    SPECIES = [
-        ('1','고양이'),
-        ('2','개'),
-        ('3','조류'),
-        ('4','기타'),
-    ]
 
     image = models.ImageField(verbose_name='본인사진', upload_to='petsitters/images/', null=True, blank=True)
     name = models.ForeignKey(to=Member,verbose_name='이름', on_delete=models.CASCADE, null=True, blank=True)
-    rnn = models.CharField(verbose_name='주민번호',max_length=14,null=True)
+    number = models.CharField(verbose_name='연락처', max_length=20, default='')
+    family = models.CharField(verbose_name='가구원', max_length=20, default='')
+    rnn = models.CharField(verbose_name='주민번호', max_length=20, default='')
     address = models.CharField(verbose_name='주소', max_length=200, default='')
-    lisence_hold = models.CharField(verbose_name='자격증 보유여부', max_length=100, choices = OPTIONS)
-    pet_experience = models.CharField(verbose_name='반려동물 경험', max_length=100, choices = OPTIONS)
-    pet_species = models.CharField(verbose_name='동물 종류', max_length=50, choices = SPECIES)
+    lisence_hold = models.CharField(verbose_name='자격증 보유여부', max_length=20, default='')
+    pet_experience = models.CharField(verbose_name='반려동물 경험', max_length=20, default='')
+    pet_species = models.CharField(verbose_name='동물 종류', max_length=20, default='')
     exprience_essay = models.TextField(verbose_name='임보 경험')
     allergy_essay = models.TextField(verbose_name='알레르기 경험')

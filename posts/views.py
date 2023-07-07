@@ -13,6 +13,7 @@ class BoardPostCreateView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
             token = self.request.headers.get('Authorization')
+            print(token)
             user = Member.objects.get(token=token)
             if token:
                 serializer.save(nickname=user)
