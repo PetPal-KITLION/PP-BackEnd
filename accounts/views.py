@@ -4,13 +4,11 @@ from .models import Member
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
-from rest_framework.decorators import permission_classes, authentication_classes
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.authentication import TokenAuthentication
 from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import get_user_model
 from django.core.mail import EmailMessage
+from django.core.exceptions import ObjectDoesNotExist
 from .serializers import MemberSerializer
 
 
@@ -37,7 +35,6 @@ class LoginView(APIView):
         if user:
             member = Member.objects.get(email=email)
             token, _ = Token.objects.get_or_create(user=user)
-            print(token)
             member.token = token.key
             member.save()
             return Response({'token':token.key})
@@ -54,7 +51,7 @@ class LogoutView(APIView):
                 member.token = ''
                 member.save()
                 return Response({'message' : '로그아웃 완료'})
-            except Token.DoesNotExist:
+            except ObjectDoesNotExist:
                 return Response({'error':'토큰이 존재하지 않습니다'},status = 401)
         return Response({'error':'유효하지 않은 토큰이거나 토큰이 없습니다.'}, status=400)
     
@@ -124,6 +121,17 @@ class ResetPasswordSaveView(APIView):
             return Response({'message':'success'},status=200)
 
         return Response({'error':'실패'},status=400)
+
+class MyProfileView(APIView):
+    
+    def get(self,request):
+        
+        token = request.headers.get('Authorization')
+        
+        if token:
+            pass
+            
+        
 
 
 def SendMail(random_code, useremail, usage):
