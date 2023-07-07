@@ -1,6 +1,6 @@
 import random
 import string
-from .models import Member, Review
+from .models import Member, Review, Pet
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
@@ -120,7 +120,7 @@ class ResetPasswordEmailView(APIView):
 
 # 비밀번호 초기화 하기
 class ResetPasswordSaveView(APIView):
-    def post(self, request):
+    def put(self, request):
 
         useremail = request.data.get('email')
         reset_password = request.data.get('reset')
@@ -133,7 +133,7 @@ class ResetPasswordSaveView(APIView):
             return Response({'message':'success'},status=200)
 
         return Response({'error':'실패'},status=400)
-
+# 프로필 조회
 class MyProfileView(APIView):
     
     def get(self,request):
@@ -166,6 +166,39 @@ class MyProfileView(APIView):
                 return Response({'error':'유효하지 않은 토큰입니다'},status = 400)
         return Response({'error':'로그인이 필요합니다'}, status=401)
 
+class EditProfileView(APIView):
+    def put(self,request):
+        token = request.headers.get('Authorization')
+        if token:
+            try:
+                member = Member.objects.get(token=token)
+                pet = Pet.objects.get(member=member)
+                
+                edit_address = request.data.get('address')
+                edit_age = int(request.data.get('age'))
+                edit_pet_name = request.data.get('pet_name')
+                edit_pet_species = request.data.get('pet_species')
+                edit_pet_age = int(request.data.get('pet_age'))
+                edit_pet_feature = request.data.get('pet_feature')
+
+               
+
+                member.address = edit_address
+                member.age = edit_age
+                member.save()
+
+                pet.name = edit_pet_name
+                pet.species = edit_pet_species
+                pet.age = edit_pet_age
+                pet.feature = edit_pet_feature
+                pet.save()
+
+
+                return Response({'message':'수정완료'}, status=200)
+            except ObjectDoesNotExist:
+                return Response({'error':'유효하지 않은 토큰입니다'},status = 400)
+        return Response({'error':'로그인이 필요합니다'}, status=401)
+        
 class RegistPetView(APIView):
     
     def post(self,request):
