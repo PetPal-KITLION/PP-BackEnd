@@ -3,10 +3,9 @@ from rest_framework.routers import DefaultRouter
 from .views import PetsittersCommentViewSet, PetsittersPostViewSet, PetsittersPostCreateView, PetsittersPostUpdateView, PetsittersPostDestroyView, PetsittersCommentViewSet, PetsittersApplyCreateView, PetsittersApplyViewSet, PetsittersApplyUpdateView, PetsittersApplyDestroyView
 
 router = DefaultRouter()
-#router.register(r'posts', PetsittersPostViewSet, basename='petsitters-post')
-#router.register(r'comments', PetsittersCommentViewSet, basename='petsitters-comment')
 
 app_name = 'petsitters'
+
 urlpatterns = [
     path('posts/', PetsittersPostViewSet.as_view({'get':'list'}), name='posts-list'),
     path('posts/create/', PetsittersPostCreateView.as_view(), name='posts-create'),
