@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path,include,re_path
-from .views import SignupView, LoginView, SendMailView, CheckDuplicateView,LogoutView,FindEmailView,ResetPasswordEmailView,ResetPasswordSaveView,MyProfileView,RegistPetView
+from .views import SignupView, LoginView, SendMailView, CheckDuplicateView,LogoutView,FindEmailView,ResetPasswordEmailView,ResetPasswordSaveView,MyProfileView,RegistPetView,ReviewCreateView
 
 
 
@@ -17,5 +17,6 @@ urlpatterns=[
     path('profile/',MyProfileView.as_view(), name="profile"),
     # path('profile/edit/',EditProfileView.as_view(), name="edit_profile"),
     path('pets/create/',RegistPetView.as_view(),name="regist_pet"),
+    path('review/create/',ReviewCreateView.as_view(),name="create_review"),
     
 ]
