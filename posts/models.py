@@ -5,17 +5,11 @@ from django.contrib.auth import get_user_model
 from accounts.models import Member
 
 class board_post(models.Model):
-    CATEGORY_CHOICES =[
-        ('1', '질문'),
-        ('2', '소통'),
-        ('3', '정보'),
-        ('4', '일상'),
-    ]
 
     id = models.AutoField( primary_key=True)
     title = models.CharField(verbose_name='제목', max_length=200)
     content = models.TextField(verbose_name='내용')
-    category = models.CharField(verbose_name='카테고리', max_length=1, choices=CATEGORY_CHOICES, default='1' )
+    category = models.CharField(verbose_name='카테고리', max_length=20, default='')
     nickname = models.ForeignKey(to=Member, on_delete = models.CASCADE,null=True, blank=True)
     file = models.FileField(verbose_name='첨부파일',upload_to='posts/uploads/', null=True, blank=True)
     
