@@ -5,7 +5,7 @@ from rest_framework.response import Response
 
 from django.contrib.auth import get_user_model
 
-#from accounts.models import Member
+from accounts.models import Member
 
 from .models import petsitters_post, petsitters_comment, petsitters_apply
 from .serializers import PetsittersPostBaseSerializer, PetsittersPostListSerializer, PetsittersCommentSerializer, PetsittersApplyBaseSerializer, PetsittersApplyListSerializer
@@ -19,8 +19,9 @@ class PetsittersPostCreateView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         token = self.request.headers.get('Authorization')
+        user = Member.objects.get(token=token)
         if token:
-            serializer.save()
+            serializer.save(member=user)
             return Response({'message':'글이 등록되었습니다.'})
         return Response({'error':'로그인이 필요합니다.'})
 
@@ -50,12 +51,22 @@ class PetsittersPostUpdateView(generics.UpdateAPIView):
     serializer_class = PetsittersPostBaseSerializer
     lookup_field = 'pk'
 
-    def get(self, request, *args, **kwargs):
+    '''
+    def put(self, request, *args, **kwargs):
         token = self.request.headers.get('Authorization')
+        user = Member.objects.get(token=token)
         if token:
             instance = self.get_object()
+            print(instance)
             serializer = self.get_serializer(instance)
+            print(serializer.data)
             return Response(serializer.data)
+        return Response({'error':'로그인이 필요합니다.'})
+    '''
+    def put(self, request, *args, **kwargs):
+        token = self.request.headers.get('Authorization')
+        if token:
+            return self.update(request, *args, **kwargs)
         return Response({'error':'로그인이 필요합니다.'})
 
 # Post - Delete
@@ -64,10 +75,10 @@ class PetsittersPostDestroyView(generics.DestroyAPIView):
     serializer_class = PetsittersPostBaseSerializer
     lookup_field = 'pk'
 
-    def get(self, request, *args, **kwargs):
+    def delete(self, request, *args, **kwargs):
         token = self.request.headers.get('Authorization')
         if token:
-            return Response({'message':'글이 삭제되었습니다.'})
+            return self.destroy(request, *args, **kwargs)
         return Response({'error':'로그인이 필요합니다.'})
 
 # Post - Comments
@@ -81,11 +92,17 @@ class PetsittersApplyCreateView(generics.CreateAPIView):
     queryset = petsitters_apply.objects.all()
     serializer_class = PetsittersApplyBaseSerializer
 
-    def post(self, request, *args, **kwargs):
+    '''def post(self, request, *args, **kwargs):
         token = self.request.headers.get('Authorization')
         if token:
             return self.create(request, *args, **kwargs)
-            return Response({'message':'지원서가 접수되었습니다.'})
+        return Response({'error':'로그인이 필요합니다.'})'''
+    def perform_create(self, serializer):
+        token = self.request.headers.get('Authorization')
+        user = Member.objects.get(token=token)
+        if token:
+            serializer.save(name=user)
+            return Response({'message':'신청서가 되었습니다.'})
         return Response({'error':'로그인이 필요합니다.'})
     
 # Apply_retrieve
@@ -115,13 +132,20 @@ class PetsittersApplyUpdateView(generics.UpdateAPIView):
     serializer_class = PetsittersApplyBaseSerializer
     lookup_field = 'pk'
 
-    def get(self, request, *args, **kwargs):
+    '''def get(self, request, *args, **kwargs):
         token = self.request.headers.get('Authorization')
         if token:
             instance = self.get_object()
             serializer = self.get_serializer(instance)
             return Response(serializer.data)
         return Response({'error':'로그인이 필요합니다.'})
+    '''
+    def put(self, request, *args, **kwargs):
+        token = self.request.headers.get('Authorization')
+        if token:
+            return self.update(request, *args, **kwargs)
+        return Response({'error':'로그인이 필요합니다.'})
+
 
 # Apply_Delete
 class PetsittersApplyDestroyView(generics.DestroyAPIView):

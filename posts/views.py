@@ -3,6 +3,7 @@ from rest_framework import viewsets, generics
 from .models import board_post, board_comment
 from .serializers import BoardPostBaseSerializer, BoardPostListSerializer, BoardCommentSerializer
 
+from accounts.models import Member
 from django.shortcuts import get_object_or_404
 
 # Board - Create
@@ -12,8 +13,9 @@ class BoardPostCreateView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
             token = self.request.headers.get('Authorization')
+            user = Member.objects.get(token=token)
             if token:
-                serializer.save()
+                serializer.save(nickname=user)
                 return Response({'message':'글이 등록되었습니다.'})
             return Response({'error':'로그인이 필요합니다.'})    
 

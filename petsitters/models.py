@@ -14,8 +14,8 @@ class petsitters_post(models.Model):
     member = models.ForeignKey(to=Member, verbose_name='작성자', on_delete=models.CASCADE, null=True, blank=True)
     title = models.CharField(verbose_name='제목', max_length=200)
     image = models.ImageField(verbose_name='이미지', upload_to='petsitters/images/', null=True, blank=True)
-    data_start = models.CharField(verbose_name='임시보호 시작 날짜',max_length=100, null=True)
-    data_end = models.CharField(verbose_name='임시보호 종료 날짜',max_length=100, null=True)
+    date_start = models.CharField(verbose_name='임시보호 시작 날짜',max_length=100, null=True)
+    date_end = models.CharField(verbose_name='임시보호 종료 날짜',max_length=100, null=True)
 
     pay = models.IntegerField(verbose_name='임시보호 수수료', default=0)
     address = models.CharField(verbose_name='주소', max_length=200, default='')

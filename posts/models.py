@@ -16,7 +16,7 @@ class board_post(models.Model):
     title = models.CharField(verbose_name='제목', max_length=200)
     content = models.TextField(verbose_name='내용')
     category = models.CharField(verbose_name='카테고리', max_length=1, choices=CATEGORY_CHOICES, default='1' )
-    nickname = models.ForeignKey(to=Member, on_delete = models.CASCADE)
+    nickname = models.ForeignKey(to=Member, on_delete = models.CASCADE,null=True, blank=True)
     file = models.FileField(verbose_name='첨부파일',upload_to='posts/uploads/', null=True, blank=True)
     
     view_count = models.IntegerField(verbose_name='조회수', default=0)
