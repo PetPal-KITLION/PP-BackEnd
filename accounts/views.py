@@ -34,7 +34,7 @@ class LoginView(APIView):
             token, _ = Token.objects.get_or_create(user=user)
             member.token = token.key
             member.save()
-            return Response({'token':token.key})
+            return Response({'token':token.key,'nickname':member.nickname})
         else:
             return Response({'message': '유저가 존재하지 않음'}, status=400)
 
