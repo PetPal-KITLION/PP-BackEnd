@@ -1,6 +1,6 @@
 import random
 import string
-from .models import Member
+from .models import Member, Review
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
@@ -175,6 +175,28 @@ class RegistPetView(APIView):
             return Response({'message':'등록완료'},status=200)
         return Response({'error':'등록실패'},status=400)
 
+class ReviewCreateView(APIView):
+    def post(self,request):
+        
+        receiver_email = request.data.get('sitter_email')
+        reviewer_email = request.data.get('host_email')
+        content = request.data.get('content')
+        star = request.data.get('star')
+        
+        print(receiver_email,reviewer_email)
+        
+        try:
+            User = get_user_model()
+            print(User)
+            receiver = User.objects.get(email=receiver_email)
+            reviewer = User.objects.get(email=reviewer_email)
+            print(receiver,reviewer)
+        except User.DoesNotExist:
+            return Response({'error': '유효하지 않은 이메일 주소'}, status=400)
+        
+        Review.objects.create(content=content, score=star, reviewer=reviewer, receiver=receiver)
+        return Response({'message': '리뷰가 성공적으로 작성되었습니다'}, status=201)
+    
 def SendMail(random_code, useremail, usage):
     if usage == 'reset-verify':
         title = 'PetPal 에서 보내는 비밀번호 재설정 메일 입니다.'
