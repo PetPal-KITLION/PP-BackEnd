@@ -30,7 +30,9 @@ class petsitters_apply(models.Model):
 
     image = models.ImageField(verbose_name='본인사진', upload_to='petsitters/images/', null=True, blank=True)
     name = models.ForeignKey(to=Member,verbose_name='이름', on_delete=models.CASCADE, null=True, blank=True)
-    rnn = models.CharField(verbose_name='주민번호',max_length=14,null=True)
+    number = models.CharField(verbose_name='연락처', max_length=20, default='')
+    family = models.CharField(verbose_name='가구원', max_length=20, default='')
+    rnn = models.CharField(verbose_name='주민번호', max_length=20, default='')
     address = models.CharField(verbose_name='주소', max_length=200, default='')
     lisence_hold = models.CharField(verbose_name='자격증 보유여부', max_length=20, default='')
     pet_experience = models.CharField(verbose_name='반려동물 경험', max_length=20, default='')
