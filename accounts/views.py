@@ -127,8 +127,7 @@ class MyProfileView(APIView):
             try:
                 member = Member.objects.get(token=token)
                 serialized_pets= PetProfileSerializer(member.pets.all(), many=True).data
-                
-                reviews = member.reviews.all()
+                reviews = member.received_reviews.all()
                 total_scores = sum(review.score for review in reviews)
                 
                 if reviews.count() > 0:
@@ -183,20 +182,38 @@ class ReviewCreateView(APIView):
         content = request.data.get('content')
         star = request.data.get('star')
         
-        print(receiver_email,reviewer_email)
-        
         try:
             User = get_user_model()
-            print(User)
             receiver = User.objects.get(email=receiver_email)
             reviewer = User.objects.get(email=reviewer_email)
-            print(receiver,reviewer)
         except User.DoesNotExist:
             return Response({'error': '유효하지 않은 이메일 주소'}, status=400)
         
         Review.objects.create(content=content, score=star, reviewer=reviewer, receiver=receiver)
         return Response({'message': '리뷰가 성공적으로 작성되었습니다'}, status=201)
-    
+
+class ReviewListView(APIView):
+    def get(self, request):
+        
+        token = request.headers.get('Authorization')
+
+        if token:
+            try:
+                member = Member.objects.get(token=token)
+                reviews = member.received_reviews.all()
+                review_data={'review':[]}
+                for review in reviews:
+                    review_data['review'].append({
+                        'review_id':review.id,
+                        'email' : review.reviewer.email,
+                        'star' : review.score,
+                        'content'  : review.content
+                    })
+                return Response(review_data, status=200)
+            except ObjectDoesNotExist:
+                return Response({'error':'유효하지 않은 토큰입니다'},status = 400)
+        return Response({'error':'로그인이 필요합니다'}, status=401)
+
 def SendMail(random_code, useremail, usage):
     if usage == 'reset-verify':
         title = 'PetPal 에서 보내는 비밀번호 재설정 메일 입니다.'
