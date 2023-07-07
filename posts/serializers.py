@@ -1,7 +1,13 @@
 from rest_framework.serializers import  ModelSerializer
 from .models import board_post, board_comment
+from accounts.models import Member
 from rest_framework import serializers
 
+
+class ExportMemberNicknameSerializer(ModelSerializer):
+    class Meta:
+        model = Member
+        fields = ['nickname']
 class BoardPostBaseSerializer(ModelSerializer):
     class Meta:
         model = board_post

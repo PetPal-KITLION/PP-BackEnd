@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from django.contrib.auth import get_user_model
-
+from django.core.exceptions import ObjectDoesNotExist
 from accounts.models import Member
 
 from .models import petsitters_post, petsitters_comment, petsitters_apply
@@ -13,17 +13,20 @@ from .serializers import PetsittersPostBaseSerializer, PetsittersPostListSeriali
 from django.shortcuts import get_object_or_404
 
 # Post - Create
-class PetsittersPostCreateView(generics.CreateAPIView):
-    queryset = petsitters_post.objects.all()
-    serializer_class = PetsittersPostBaseSerializer
 
-    def perform_create(self, serializer):
+class PetsittersPostCreateView(APIView):
+    def post(self,request):
         token = self.request.headers.get('Authorization')
-        user = Member.objects.get(token=token)
         if token:
-            serializer.save(member=user)
-            return Response({'message':'글이 등록되었습니다.'})
-        return Response({'error':'로그인이 필요합니다.'})
+            try:
+                user = Member.objects.get(token=token)
+                serializer = PetsittersPostBaseSerializer(data=request.data)
+                if serializer.is_valid():
+                    serializer.save(member=user)
+                    return Response({'data':serializer.data,'nickname':user.nickname})
+            except ObjectDoesNotExist:
+                Response({'error':'토큰유효 x'},status=400)
+        return Response({'error':'로그인하셈'},status=401)
 
 # Post - Retrieve        
 class PetsittersPostViewSet(viewsets.ModelViewSet):
@@ -88,22 +91,19 @@ class PetsittersCommentViewSet(viewsets.ModelViewSet):
 
     
 # Apply_create
-class PetsittersApplyCreateView(generics.CreateAPIView):
-    queryset = petsitters_apply.objects.all()
-    serializer_class = PetsittersApplyBaseSerializer
-
-    '''def post(self, request, *args, **kwargs):
+class PetsittersApplyCreateView(APIView):
+    def post(self,request):
         token = self.request.headers.get('Authorization')
         if token:
-            return self.create(request, *args, **kwargs)
-        return Response({'error':'로그인이 필요합니다.'})'''
-    def perform_create(self, serializer):
-        token = self.request.headers.get('Authorization')
-        user = Member.objects.get(token=token)
-        if token:
-            serializer.save(name=user)
-            return Response({'message':'신청서가 되었습니다.'})
-        return Response({'error':'로그인이 필요합니다.'})
+            try:
+                user = Member.objects.get(token=token)
+                serializer = PetsittersPostBaseSerializer(data=request.data)
+                if serializer.is_valid():
+                    serializer.save(name=user)
+                    return Response({'data':serializer.data,'nickname':user.nickname})
+            except ObjectDoesNotExist:
+                Response({'error':'토큰유효 x'},status=400)
+        return Response({'error':'로그인하셈'},status=401)
     
 # Apply_retrieve
 class PetsittersApplyViewSet(viewsets.ModelViewSet):

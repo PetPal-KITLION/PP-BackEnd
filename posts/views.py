@@ -1,24 +1,28 @@
 from rest_framework.response import Response
 from rest_framework import viewsets, generics
+from rest_framework.views import APIView
 from .models import board_post, board_comment
-from .serializers import BoardPostBaseSerializer, BoardPostListSerializer, BoardCommentSerializer
+from .serializers import BoardPostBaseSerializer, BoardPostListSerializer, BoardCommentSerializer, ExportMemberNicknameSerializer
 
 from accounts.models import Member
+from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404
 
 # Board - Create
-class BoardPostCreateView(generics.CreateAPIView):
-    queryset = board_post.objects.all()
-    serializer_class = BoardPostBaseSerializer
-
-    def perform_create(self, serializer):
-            token = self.request.headers.get('Authorization')
-            print(token)
-            user = Member.objects.get(token=token)
-            if token:
-                serializer.save(nickname=user)
-                return Response({'message':'글이 등록되었습니다.'})
-            return Response({'error':'로그인이 필요합니다.'})    
+class BoardPostCreateView(APIView):
+    def post(self,request):
+        token = self.request.headers.get('Authorization')
+        if token:
+            try:
+                user = Member.objects.get(token=token)
+                serializer = BoardPostBaseSerializer(data=request.data)
+                if serializer.is_valid():
+                    serializer.save(nickname=user)
+                    return Response({'data':serializer.data,'nickname':user.nickname})
+            except ObjectDoesNotExist:
+                Response({'error':'토큰유효 x'},status=400)
+        return Response({'error':'로그인하셈'},status=401)
+    
 
 # Board - Retrieve        
 class BoardPostBaseViewSet(viewsets.ModelViewSet):
@@ -39,7 +43,15 @@ class BoardPostBaseViewSet(viewsets.ModelViewSet):
         post = get_object_or_404(board_post, pk=pk)
         serializer = self.get_serializer(post)
         return Response(serializer.data)
-
+    
+    '''def create_comment(self, request, pk=None):
+        token = self.request.headers.get('Authorization')
+            user = Member.objects.get(token=token)
+            if token:
+                serializer.save(nickname=user)
+                return Response({'message':'글이 등록되었습니다.'})
+            return Response({'error':'로그인이 필요합니다.'}) 
+'''
 # Post - Update
 class BoardPostUpdateView(generics.UpdateAPIView):
     queryset = board_post.objects.all()
@@ -67,6 +79,7 @@ class BoardPostDestroyView(generics.DestroyAPIView):
         return Response({'error':'로그인이 필요합니다.'})
 
 # Board - Comment
-class BoardCommentViewSet(viewsets.ModelViewSet):
-    queryset = board_comment.objects.all()
-    serializer_class = BoardCommentSerializer
+#class BoardCommentViewSet(viewsets.ModelViewSet):
+#    queryset = board_comment.objects.all()
+#    serializer_class = BoardCommentSerializer
+    
