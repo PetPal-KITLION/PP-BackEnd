@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth import get_user_model
 
 class MemberManager(BaseUserManager):
 
@@ -54,7 +55,8 @@ class Review(models.Model):
     id = models.AutoField(primary_key=True, unique=True)
     content = models.TextField(verbose_name='리뷰내용', default='')
     score = models.IntegerField(verbose_name='점수')
-    member = models.ForeignKey(to=Member, on_delete=models.CASCADE, related_name='reviews')
+    reviewer = models.ForeignKey(to=get_user_model(), on_delete=models.CASCADE, related_name='given_reviews', default = '')
+    receiver = models.ForeignKey(to=get_user_model(), on_delete=models.CASCADE, related_name='received_reviews', default = '')
     
     def __str__(self):
         return f"Review {self.score}"
