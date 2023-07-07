@@ -14,7 +14,6 @@ from .serializers import MemberSignUpSerializer, PetProfileSerializer,PetBaseSer
 
 # Create your views here.
 
-# 회원가입
 class SignupView(APIView):
     def post(self, request):
         serializer = MemberSignUpSerializer(data = request.data)
@@ -24,6 +23,7 @@ class SignupView(APIView):
         return Response(serializer.errors, status =  400)
 
 # 로그인
+
 class LoginView(APIView):
     def post(self, request):
         email = request.data.get('email')

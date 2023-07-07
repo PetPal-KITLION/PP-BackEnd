@@ -18,5 +18,8 @@ from django.urls import path,include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', include('posts.urls')),  # 빈 경로에 대한 URL 패턴을 posts 앱의 URL 패턴으로 연결
+    path('posts/', include('posts.urls')),
+    path('petsitters/', include('petsitters.urls')),
     path('accounts/', include('accounts.urls'))
 ]
