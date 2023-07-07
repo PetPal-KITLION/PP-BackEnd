@@ -61,6 +61,21 @@ class SendMailView(APIView):
         return Response({'code':random_code},status = 200)
     
 
+# 회원 탈퇴
+
+class DeleteMember(APIView):
+    def post(self,request):
+        
+        token = request.headers.get('Authorization')
+        if token:
+            try:
+                member = Member.objects.get(token=token)
+                member.delete()
+                return Response({'message':'탈퇴완료'}, status=200)
+            except ObjectDoesNotExist:
+                return Response({'error':'유효하지 않은 토큰입니다'},status = 400)
+        return Response({'error':'로그인이 필요합니다'}, status=401)
+    
 
 # 이메일 / 닉네임 중복확인
 class CheckDuplicateView(APIView):
