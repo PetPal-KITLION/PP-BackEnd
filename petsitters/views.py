@@ -48,6 +48,13 @@ class PetsittersPostViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(post)
         return Response(serializer.data)
 
+    def create_comment(self, request, pk=None):
+        # 댓글 작성 로직 구현
+        # request.data를 통해 전달된 데이터를 사용하여 댓글을 작성하고 저장합니다.
+        # 부모 게시글 (BoardPost)의 정보를 가져와 댓글에 연결할 수 있습니다.
+        # 댓글을 저장한 후 적절한 응답을 반환합니다.
+        return Response({'message': '댓글이 작성되었습니다.'})
+    
 # Post - Update
 class PetsittersPostUpdateView(generics.UpdateAPIView):
     queryset = petsitters_post.objects.all()
@@ -94,15 +101,18 @@ class PetsittersCommentViewSet(viewsets.ModelViewSet):
 class PetsittersApplyCreateView(APIView):
     def post(self,request):
         token = self.request.headers.get('Authorization')
+        print(token)
         if token:
             try:
                 user = Member.objects.get(token=token)
-                serializer = PetsittersPostBaseSerializer(data=request.data)
+                serializer = PetsittersApplyBaseSerializer(data=request.data)
                 if serializer.is_valid():
                     serializer.save(name=user)
                     return Response({'data':serializer.data,'nickname':user.nickname})
+                else:
+                    return Response({'error':'데이터 맞게보내셈'},status=400)
             except ObjectDoesNotExist:
-                Response({'error':'토큰유효 x'},status=400)
+                return Response({'error':'토큰유효 x'},status=400)
         return Response({'error':'로그인하셈'},status=401)
     
 # Apply_retrieve
