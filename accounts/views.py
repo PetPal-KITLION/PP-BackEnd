@@ -5,22 +5,19 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
-from django.contrib.auth.hashers import make_password
 from django.contrib.auth import get_user_model
 from django.core.mail import EmailMessage
 from django.core.exceptions import ObjectDoesNotExist
-from .serializers import MemberSerializer
+from .serializers import MemberSignUpSerializer, PetProfileSerializer,PetBaseSerializer
 
 
 
 # Create your views here.
 
-
-
 # 회원가입
 class SignupView(APIView):
     def post(self, request):
-        serializer = MemberSerializer(data = request.data)
+        serializer = MemberSignUpSerializer(data = request.data)
         if serializer.is_valid():
             serializer.save()
             return Response({'message':'회원가입 완료'})
@@ -52,8 +49,8 @@ class LogoutView(APIView):
                 member.save()
                 return Response({'message' : '로그아웃 완료'})
             except ObjectDoesNotExist:
-                return Response({'error':'토큰이 존재하지 않습니다'},status = 401)
-        return Response({'error':'유효하지 않은 토큰이거나 토큰이 없습니다.'}, status=400)
+                return Response({'error':'로그인 해주세요'},status = 401)
+        return Response({'error':'토큰이 없습니다.'}, status=400)
     
 # 이메일 인증 메일 보내기
 class SendMailView(APIView):
@@ -125,14 +122,55 @@ class ResetPasswordSaveView(APIView):
 class MyProfileView(APIView):
     
     def get(self,request):
-        
         token = request.headers.get('Authorization')
-        
         if token:
-            pass
-            
-        
+            try:
+                member = Member.objects.get(token=token)
+                serialized_pets= PetProfileSerializer(member.pets.all(), many=True).data
+                
+                reviews = member.reviews.all()
+                total_scores = sum(review.score for review in reviews)
+                
+                if reviews.count() > 0:
+                    average_score = total_scores/reviews.count()
+                else:
+                    average_score = 0
+                
+                profile_data = {
+                    'name' : member.name,
+                    'address' : member.address,
+                    'age' : member.age,
+                    'review_star' : average_score,
+                    'pets' : serialized_pets,
+                }
+                
+                return Response(profile_data, status=200)
+            except ObjectDoesNotExist:
+                return Response({'error':'로그인 해주세요'},status = 401)
+        return Response({'error':'토큰이 없습니다.'}, status=400)
 
+class RegistPetView(APIView):
+    
+    def post(self,request):
+        useremail = request.data.get('email')
+        pet_data = {
+            'name' : request.data.get('pet_name'),
+            'species' : request.data.get('pet_species'),
+            'age' : int(request.data.get('pet_age')),
+            'feature' : request.data.get('pet_feature')
+        }
+        try: 
+            user = Member.objects.get(email=useremail)
+        except Member.DoesNotExist:
+            return Response({'error':'User not found'}, status=404)
+        
+        pet_data['member'] = user.id
+        serializer = PetBaseSerializer(data=pet_data)
+    
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message':'등록완료'},status=200)
+        return Response({'error':'등록실패'},status=400)
 
 def SendMail(random_code, useremail, usage):
     if usage == 'reset-verify':
